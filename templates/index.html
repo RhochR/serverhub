@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,13 +19,13 @@
   </div>
 
   <div class="nav-rail-footer">
-    <button class="nav-fab" id="addServerBtn" title="Server hinzufügen">
+    <button class="nav-fab" id="addServerBtn" title="Add server">
       <span class="material-icons-round">add</span>
     </button>
-    <button class="nav-icon-btn" id="themeToggle" title="Theme wechseln">
+    <button class="nav-icon-btn" id="themeToggle" title="Toggle theme">
       <span class="material-icons-round" id="themeIcon">light_mode</span>
     </button>
-    <button class="nav-icon-btn" id="manageCatsBtn" title="Kategorien verwalten">
+    <button class="nav-icon-btn" id="manageCatsBtn" title="Manage categories">
       <span class="material-icons-round">category</span>
     </button>
   </div>
@@ -36,12 +36,12 @@
   <header class="top-bar">
     <div class="top-bar-left">
       <h1 class="page-title" id="pageTitle">All Servers</h1>
-      <span class="server-count" id="serverCount">0 Server</span>
+      <span class="server-count" id="serverCount">0 Servers</span>
     </div>
     <div class="top-bar-right">
       <div class="search-bar">
         <span class="material-icons-round search-icon">search</span>
-        <input type="text" id="searchInput" placeholder="Suchen…" autocomplete="off" />
+        <input type="text" id="searchInput" placeholder="Search…" autocomplete="off" />
       </div>
     </div>
   </header>
@@ -52,8 +52,8 @@
     </div>
     <div class="empty-state" id="emptyState" style="display:none">
       <span class="material-icons-round empty-icon">dns</span>
-      <p>Keine Server in dieser Kategorie.</p>
-      <button class="btn-filled" onclick="openAddModal()">Server hinzufügen</button>
+      <p>No servers in this category.</p>
+      <button class="btn-filled" onclick="openAddModal()">Add server</button>
     </div>
   </div>
 </main>
@@ -62,7 +62,7 @@
 <div class="modal-backdrop" id="serverModal">
   <div class="modal md3-dialog">
     <div class="modal-header">
-      <h2 id="modalTitle">Server hinzufügen</h2>
+      <h2 id="modalTitle">Add Server</h2>
       <button class="icon-btn" onclick="closeModal('serverModal')">
         <span class="material-icons-round">close</span>
       </button>
@@ -72,7 +72,7 @@
       <div class="field-group">
         <label class="field-label">Name</label>
         <div class="text-field">
-          <input type="text" id="sName" placeholder="z.B. Home Server" />
+          <input type="text" id="sName" placeholder="e.g. Home Server" />
         </div>
       </div>
       <div class="field-group">
@@ -82,13 +82,13 @@
         </div>
       </div>
       <div class="field-group">
-        <label class="field-label">Beschreibung</label>
+        <label class="field-label">Description</label>
         <div class="text-field">
           <input type="text" id="sDesc" placeholder="Optional" />
         </div>
       </div>
       <div class="field-group">
-        <label class="field-label">Kategorie</label>
+        <label class="field-label">Category</label>
         <div class="text-field select-wrap">
           <select id="sCat"></select>
           <span class="material-icons-round select-arrow">expand_more</span>
@@ -102,7 +102,7 @@
         </div>
       </div>
       <div class="field-group">
-        <label class="field-label">Farbe</label>
+        <label class="field-label">Color</label>
         <div class="color-picker-row">
           <div class="color-swatches" id="colorSwatches"></div>
           <input type="color" id="sColor" value="#6750A4" />
@@ -110,8 +110,8 @@
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn-text" onclick="closeModal('serverModal')">Abbrechen</button>
-      <button class="btn-filled" onclick="saveServer()">Speichern</button>
+      <button class="btn-text" onclick="closeModal('serverModal')">Cancel</button>
+      <button class="btn-filled" onclick="saveServer()">Save</button>
     </div>
   </div>
 </div>
@@ -120,7 +120,7 @@
 <div class="modal-backdrop" id="catModal">
   <div class="modal md3-dialog">
     <div class="modal-header">
-      <h2>Kategorien verwalten</h2>
+      <h2>Manage Categories</h2>
       <button class="icon-btn" onclick="closeModal('catModal')">
         <span class="material-icons-round">close</span>
       </button>
@@ -128,13 +128,13 @@
     <div class="modal-body">
       <div id="catList" class="cat-list"></div>
       <div class="field-group" style="margin-top:20px">
-        <label class="field-label">Neue Kategorie</label>
+        <label class="field-label">New Category</label>
         <div style="display:flex;gap:10px;align-items:center">
           <div class="text-field" style="flex:1">
             <input type="text" id="newCatName" placeholder="Name" />
           </div>
           <div class="text-field" style="width:150px">
-            <input type="text" id="newCatIcon" placeholder="Icon (z.B. cloud)" />
+            <input type="text" id="newCatIcon" placeholder="Icon (e.g. cloud)" />
           </div>
           <button class="btn-filled" onclick="addCategory()">
             <span class="material-icons-round">add</span>
@@ -143,7 +143,7 @@
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn-filled" onclick="closeModal('catModal')">Fertig</button>
+      <button class="btn-filled" onclick="closeModal('catModal')">Done</button>
     </div>
   </div>
 </div>
@@ -152,14 +152,14 @@
 <div class="modal-backdrop" id="confirmModal">
   <div class="modal md3-dialog small-dialog">
     <div class="modal-header">
-      <h2>Server löschen?</h2>
+      <h2>Delete Server?</h2>
     </div>
     <div class="modal-body">
-      <p id="confirmText">Möchtest du diesen Server wirklich löschen?</p>
+      <p id="confirmText">Are you sure you want to delete this server?</p>
     </div>
     <div class="modal-actions">
-      <button class="btn-text" onclick="closeModal('confirmModal')">Abbrechen</button>
-      <button class="btn-filled danger" id="confirmDeleteBtn">Löschen</button>
+      <button class="btn-text" onclick="closeModal('confirmModal')">Cancel</button>
+      <button class="btn-filled danger" id="confirmDeleteBtn">Delete</button>
     </div>
   </div>
 </div>
