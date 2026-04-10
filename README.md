@@ -3,6 +3,15 @@ A dashboard for accessing all your selfhosted servers quickly.
 
 ![Screenshot](https://raw.githubusercontent.com/RhochR/serverhub/refs/heads/main/screenshots/Screenshot.png)
 
+## ⚡ Features
+
+* **Material Design 3 Expressive UI**
+* **Adaptive Navigation Rail**
+* **Glitch-Free Server Grid**
+* **Visual Personalization**
+* **Integrated Server Management**
+* **Expressive Interactivity**
+
 ## Quick start guide
 All you need to do is run:
 ```bash
