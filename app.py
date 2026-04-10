@@ -30,7 +30,7 @@ DEFAULT_DATA = {
         {"id": "homelab", "name": "Homelab", "icon": "home"},
         {"id": "vps", "name": "VPS", "icon": "cloud"},
         {"id": "monitoring", "name": "Monitoring", "icon": "monitor_heart"},
-        {"id": "services", "name": "Services", "icon": "apps"}
+        {"id": "services", "name": "Services", "icon": "home_repair_service"}
     ]
 }
 
