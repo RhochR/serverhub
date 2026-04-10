@@ -2,8 +2,8 @@
 
 const COLORS = [
   "#6750A4","#0061A4","#006E1C","#9C4000","#984061",
-  "#006A6B","#6B5778","#006491","#36618E","#1B5E20",
-  "#7B1FA2","#C62828","#E65100","#1565C0","#00695C"
+"#006A6B","#6B5778","#006491","#36618E","#1B5E20",
+"#7B1FA2","#C62828","#E65100","#1565C0","#00695C"
 ];
 
 let allData = { servers: [], categories: [] };
@@ -17,6 +17,7 @@ async function init() {
   renderGrid();
   setupSearch();
   setupTheme();
+  setupNavRail();
   populateColorSwatches();
 }
 
@@ -25,12 +26,39 @@ async function loadData() {
   allData = await res.json();
 }
 
+// ─── MD3 Expressive Navigation Rail ───
+// Manages the collapsed ↔ expanded toggle.
+// Per MD3 spec:
+//   • Collapsed  = 80px, icon-only, active indicator is a pill behind icon
+//   • Expanded   = 256px, icon + label, active indicator stretches full width
+function setupNavRail() {
+  const rail = document.getElementById("navRail");
+  const menuBtn = document.getElementById("navMenuBtn");
+
+  // Persist expand state across page loads
+  const savedExpanded = localStorage.getItem("navExpanded") === "true";
+  if (savedExpanded) rail.classList.add("expanded");
+  updateMenuIcon(savedExpanded);
+
+  menuBtn.addEventListener("click", () => {
+    const isExpanded = rail.classList.toggle("expanded");
+    localStorage.setItem("navExpanded", isExpanded);
+    updateMenuIcon(isExpanded);
+  });
+}
+
+function updateMenuIcon(isExpanded) {
+  // Menu icon becomes close/back when expanded — expressively communicates state
+  const icon = document.querySelector("#navMenuBtn .material-icons-round");
+  if (icon) icon.textContent = isExpanded ? "menu_open" : "menu";
+}
+
 // ─── Navigation ───
 function renderNav() {
   const container = document.getElementById("navItems");
   container.innerHTML = "";
 
-  const allBtn = makeNavItem("all", "Alle", "apps");
+  const allBtn = makeNavItem("all", "All Servers", "apps");
   container.appendChild(allBtn);
 
   allData.categories.forEach(cat => {
@@ -42,13 +70,24 @@ function renderNav() {
 function makeNavItem(id, name, icon) {
   const btn = document.createElement("button");
   btn.className = "nav-item" + (activeCategory === id ? " active" : "");
-  btn.innerHTML = `<span class="material-icons-round">${icon}</span><span class="nav-item-label">${name}</span>`;
+  // data-tooltip is shown on hover when rail is collapsed (CSS-driven)
+  btn.setAttribute("data-tooltip", name);
+
+  // MD3 structure: indicator div (contains icon) + label span
+  // The indicator pill is behind the icon; in expanded mode the whole item gets bg
+  btn.innerHTML = `
+  <div class="nav-item-indicator">
+  <span class="material-icons-round">${icon}</span>
+  </div>
+  <span class="nav-item-label">${name}</span>
+  `;
+
   btn.onclick = () => {
     activeCategory = id;
     document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("pageTitle").textContent =
-      id === "all" ? "Alle Server" : allData.categories.find(c => c.id === id)?.name || "Server";
+    id === "all" ? "All Servers" : allData.categories.find(c => c.id === id)?.name || "Servers";
     renderGrid();
   };
   return btn;
@@ -67,14 +106,14 @@ function renderGrid(filter = "") {
   if (filter) {
     const q = filter.toLowerCase();
     servers = servers.filter(s =>
-      s.name.toLowerCase().includes(q) ||
-      (s.description || "").toLowerCase().includes(q) ||
-      (s.url || "").toLowerCase().includes(q)
+    s.name.toLowerCase().includes(q) ||
+    (s.description || "").toLowerCase().includes(q) ||
+    (s.url || "").toLowerCase().includes(q)
     );
   }
 
   const count = allData.servers.filter(s => activeCategory === "all" || s.category === activeCategory).length;
-  document.getElementById("serverCount").textContent = `${count} Server`;
+  document.getElementById("serverCount").textContent = `${count} Server${count !== 1 ? "s" : ""}`;
 
   if (servers.length === 0) {
     empty.style.display = "flex";
@@ -96,36 +135,36 @@ function buildCard(s) {
   card.style.setProperty("--card-accent", accent);
 
   card.innerHTML = `
-    <div class="card-accent-bar"></div>
-    <div class="card-body">
-      <div class="card-top">
-        <div class="card-icon-wrap">
-          <span class="material-icons-round">${s.icon || "dns"}</span>
-        </div>
-        <div class="card-actions">
-          <button class="card-icon-btn" onclick="openEditModal(event,'${s.id}')" title="Bearbeiten">
-            <span class="material-icons-round">edit</span>
-          </button>
-          <button class="card-icon-btn danger" onclick="confirmDelete(event,'${s.id}','${escHtml(s.name)}')" title="Löschen">
-            <span class="material-icons-round">delete</span>
-          </button>
-        </div>
-      </div>
-      <div class="card-info">
-        <div class="card-name">${escHtml(s.name)}</div>
-        ${s.description ? `<div class="card-desc">${escHtml(s.description)}</div>` : ""}
-      </div>
-      <div class="card-url">
-        <span class="material-icons-round">link</span>
-        ${escHtml(s.url)}
-      </div>
-    </div>
-    <div class="card-footer">
-      <a class="btn-open" href="${escHtml(s.url)}" target="_blank" rel="noopener">
-        <span class="material-icons-round" style="font-size:18px">open_in_new</span>
-        Öffnen
-      </a>
-    </div>
+  <div class="card-accent-bar"></div>
+  <div class="card-body">
+  <div class="card-top">
+  <div class="card-icon-wrap">
+  <span class="material-icons-round">${s.icon || "dns"}</span>
+  </div>
+  <div class="card-actions">
+  <button class="card-icon-btn" onclick="openEditModal(event,'${s.id}')" title="Edit">
+  <span class="material-icons-round">edit</span>
+  </button>
+  <button class="card-icon-btn danger" onclick="confirmDelete(event,'${s.id}','${escHtml(s.name)}')" title="Delete">
+  <span class="material-icons-round">delete</span>
+  </button>
+  </div>
+  </div>
+  <div class="card-info">
+  <div class="card-name">${escHtml(s.name)}</div>
+  ${s.description ? `<div class="card-desc">${escHtml(s.description)}</div>` : ""}
+  </div>
+  <div class="card-url">
+  <span class="material-icons-round">link</span>
+  ${escHtml(s.url)}
+  </div>
+  </div>
+  <div class="card-footer">
+  <a class="btn-open" href="${escHtml(s.url)}" target="_blank" rel="noopener">
+  <span class="material-icons-round" style="font-size:18px">open_in_new</span>
+  Open
+  </a>
+  </div>
   `;
   return card;
 }
@@ -183,7 +222,7 @@ function selectColor(c) {
 // ─── Add/Edit Modal ───
 window.openAddModal = function () {
   editingId = null;
-  document.getElementById("modalTitle").textContent = "Server hinzufügen";
+  document.getElementById("modalTitle").textContent = "Add Server";
   document.getElementById("editId").value = "";
   document.getElementById("sName").value = "";
   document.getElementById("sUrl").value = "";
@@ -200,7 +239,7 @@ function openEditModal(e, id) {
   const s = allData.servers.find(x => x.id === id);
   if (!s) return;
   editingId = id;
-  document.getElementById("modalTitle").textContent = "Server bearbeiten";
+  document.getElementById("modalTitle").textContent = "Edit Server";
   document.getElementById("sName").value = s.name;
   document.getElementById("sUrl").value = s.url;
   document.getElementById("sDesc").value = s.description || "";
@@ -214,13 +253,13 @@ function openEditModal(e, id) {
 function populateCatSelect(selected) {
   const sel = document.getElementById("sCat");
   sel.innerHTML = allData.categories.map(c =>
-    `<option value="${c.id}" ${c.id === selected ? "selected" : ""}>${c.name}</option>`
+  `<option value="${c.id}" ${c.id === selected ? "selected" : ""}>${c.name}</option>`
   ).join("");
 }
 
 window.updateIconPreview = function () {
   document.getElementById("iconPreview").textContent =
-    document.getElementById("sIcon").value || "dns";
+  document.getElementById("sIcon").value || "dns";
 };
 
 window.saveServer = async function () {
@@ -232,18 +271,18 @@ window.saveServer = async function () {
     icon: document.getElementById("sIcon").value.trim() || "dns",
     color: document.getElementById("sColor").value,
   };
-  if (!payload.name || !payload.url) { showToast("Name und URL sind pflicht!"); return; }
+  if (!payload.name || !payload.url) { showToast("Name and URL are required!"); return; }
 
   if (editingId) {
     await fetch(`/api/servers/${editingId}`, {
       method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
     });
-    showToast("Server aktualisiert");
+    showToast("Server updated");
   } else {
     await fetch("/api/servers", {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
     });
-    showToast("Server hinzugefügt");
+    showToast("Server added");
   }
   closeModal("serverModal");
   await loadData();
@@ -253,11 +292,11 @@ window.saveServer = async function () {
 // ─── Delete ───
 function confirmDelete(e, id, name) {
   e.stopPropagation();
-  document.getElementById("confirmText").textContent = `"${name}" wirklich löschen?`;
+  document.getElementById("confirmText").textContent = `Delete "${name}"?`;
   document.getElementById("confirmDeleteBtn").onclick = async () => {
     await fetch(`/api/servers/${id}`, { method: "DELETE" });
     closeModal("confirmModal");
-    showToast("Server gelöscht");
+    showToast("Server deleted");
     await loadData();
     renderGrid(document.getElementById("searchInput").value);
   };
@@ -273,13 +312,13 @@ document.getElementById("manageCatsBtn").onclick = () => {
 function renderCatList() {
   const list = document.getElementById("catList");
   list.innerHTML = allData.categories.map(c => `
-    <div class="cat-item">
-      <span class="material-icons-round">${c.icon || "folder"}</span>
-      <span class="cat-item-name">${escHtml(c.name)}</span>
-      <button class="cat-item-btn" onclick="deleteCategory('${c.id}')">
-        <span class="material-icons-round">delete</span>
-      </button>
-    </div>
+  <div class="cat-item">
+  <span class="material-icons-round">${c.icon || "folder"}</span>
+  <span class="cat-item-name">${escHtml(c.name)}</span>
+  <button class="cat-item-btn" onclick="deleteCategory('${c.id}')">
+  <span class="material-icons-round">delete</span>
+  </button>
+  </div>
   `).join("");
 }
 
@@ -295,7 +334,7 @@ window.addCategory = async function () {
   await loadData();
   renderNav();
   renderCatList();
-  showToast("Kategorie hinzugefügt");
+  showToast("Category added");
 };
 
 window.deleteCategory = async function (id) {
@@ -305,7 +344,7 @@ window.deleteCategory = async function (id) {
   renderNav();
   renderGrid();
   renderCatList();
-  showToast("Kategorie gelöscht");
+  showToast("Category deleted");
 };
 
 // ─── FAB button ───
