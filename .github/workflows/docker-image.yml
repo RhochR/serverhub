@@ -1,0 +1,32 @@
+on:
+  push:
+    branches: ["main"]
+  release:
+    types: [published, prereleased]
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/rhochr/serverhub:${{ github.ref_name }}
+            ${{ github.event.release.prerelease == false && 'ghcr.io/rhochr/serverhub:latest' || 'ghcr.io/rhochr/serverhub:edge' }}
