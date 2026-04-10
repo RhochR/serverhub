@@ -1,6 +1,4 @@
 on:
-  push:
-    branches: ["main"]
   release:
     types: [published, prereleased]
 
@@ -25,14 +23,10 @@ jobs:
       - name: Set image tags
         id: tags
         run: |
-          if [ "${{ github.event_name }}" = "release" ]; then
-            if [ "${{ github.event.release.prerelease }}" = "true" ]; then
-              echo "tags=ghcr.io/rhochr/serverhub:${{ github.ref_name }},ghcr.io/rhochr/serverhub:edge" >> $GITHUB_OUTPUT
-            else
-              echo "tags=ghcr.io/rhochr/serverhub:${{ github.ref_name }},ghcr.io/rhochr/serverhub:latest" >> $GITHUB_OUTPUT
-            fi
+          if [ "${{ github.event.release.prerelease }}" = "true" ]; then
+            echo "tags=ghcr.io/rhochr/serverhub:${{ github.ref_name }},ghcr.io/rhochr/serverhub:edge" >> $GITHUB_OUTPUT
           else
-            echo "tags=ghcr.io/rhochr/serverhub:dev" >> $GITHUB_OUTPUT
+            echo "tags=ghcr.io/rhochr/serverhub:${{ github.ref_name }},ghcr.io/rhochr/serverhub:latest" >> $GITHUB_OUTPUT
           fi
 
       - name: Build and push Docker image
