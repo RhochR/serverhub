@@ -1,5 +1,8 @@
 # serverhub
 A dashboard for accessing all your selfhosted servers quickly.
+
+![Screenshot](https://raw.githubusercontent.com/RhochR/serverhub/refs/heads/main/screenshots/Screenshot_20260410_101804.png)
+
 ## Quick start guide
 ### Data persistence
 
