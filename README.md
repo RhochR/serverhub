@@ -10,8 +10,6 @@ docker run -p 5000:5000 -v /your/host/path:/data ghcr.io/rhochr/serverhub:latest
 ```
 Replace /your/host/path with where you want to store the data.
 There are three channels to container releases:
-- :dev
-   The latest development commits, likely very buggy
 - :edge
    The latest pre-release
 - :latest
