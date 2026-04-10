@@ -100,32 +100,60 @@ function renderGrid(filter = "") {
   grid.innerHTML = "";
 
   let servers = allData.servers;
-  if (activeCategory !== "all") {
-    servers = servers.filter(s => s.category === activeCategory);
-  }
+  const isGroupedView = activeCategory === "all" && !filter;
+
   if (filter) {
     const q = filter.toLowerCase();
     servers = servers.filter(s =>
-    s.name.toLowerCase().includes(q) ||
-    (s.description || "").toLowerCase().includes(q) ||
-    (s.url || "").toLowerCase().includes(q)
+      s.name.toLowerCase().includes(q) ||
+      (s.description || "").toLowerCase().includes(q) ||
+      (s.url || "").toLowerCase().includes(q)
     );
+  } else if (activeCategory !== "all") {
+    servers = servers.filter(s => s.category === activeCategory);
   }
 
-  const count = allData.servers.filter(s => activeCategory === "all" || s.category === activeCategory).length;
+  const count = servers.length;
   document.getElementById("serverCount").textContent = `${count} Server${count !== 1 ? "s" : ""}`;
 
-  if (servers.length === 0) {
+  if (count === 0) {
     empty.style.display = "flex";
     return;
   }
   empty.style.display = "none";
 
-  servers.forEach((s, i) => {
-    const card = buildCard(s);
-    card.style.animationDelay = `${i * 40}ms`;
-    grid.appendChild(card);
-  });
+  if (isGroupedView) {
+    // Grouped layout for "All Servers"
+    allData.categories.forEach(cat => {
+      const catServers = servers.filter(s => s.category === cat.id);
+      if (catServers.length > 0) {
+        const section = document.createElement("section");
+        section.className = "grid-group";
+        section.innerHTML = `
+          <div class="group-header">
+            <span class="material-icons-round">${cat.icon || 'folder'}</span>
+            <h2 class="group-title">${cat.name}</h2>
+            <div class="group-divider"></div>
+          </div>
+          <div class="group-content"></div>
+        `;
+        const container = section.querySelector(".group-content");
+        catServers.forEach((s, i) => {
+          const card = buildCard(s);
+          card.style.animationDelay = `${i * 40}ms`;
+          container.appendChild(card);
+        });
+        grid.appendChild(section);
+      }
+    });
+  } else {
+    // Standard flat grid for search or specific category
+    servers.forEach((s, i) => {
+      const card = buildCard(s);
+      card.style.animationDelay = `${i * 40}ms`;
+      grid.appendChild(card);
+    });
+  }
 }
 
 function buildCard(s) {

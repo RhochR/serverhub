@@ -912,3 +912,59 @@ input[type="color"] {
   opacity: 1;
   transform: translateY(-50%) scale(1);
 }
+
+/* ─── Grouped Grid Layout ─── */
+.server-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 32px; /* Space between groups */
+}
+
+/* Fallback for flat grid (search results) */
+.server-grid:not(:has(.grid-group)) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 340px);
+  gap: 18px;
+}
+
+.grid-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* M3E Header Style */
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.group-header .material-icons-round {
+  font-size: 20px;
+  color: var(--md-sys-color-primary);
+}
+
+.group-title {
+  font-family: var(--font-display);
+  font-size: 14px; /* M3E Title Small/Medium */
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.group-divider {
+  height: 1px;
+  flex: 1;
+  background: var(--md-sys-color-outline-variant);
+  opacity: 0.4;
+}
+
+/* Sub-grid container to keep cards fixed width and glitch-free */
+.group-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 340px);
+  gap: 18px;
+}
