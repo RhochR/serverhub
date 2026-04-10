@@ -6,11 +6,10 @@ A dashboard for accessing all your selfhosted servers quickly.
 ## ⚡ Features
 
 * **Material Design 3 Expressive UI**
-* **Adaptive Navigation Rail**
-* **Glitch-Free Server Grid**
-* **Visual Personalization**
-* **Integrated Server Management**
-* **Expressive Interactivity**
+* **Custom Server Categories**
+* **Dark/Light-Mode**
+* **Easy Setup**
+* **Fast deployment**
 
 ## Quick start guide
 All you need to do is run:
@@ -24,3 +23,19 @@ There are three channels to container releases:
 - :latest
    The latest version
 - You can alway specify a specific release (e.g. :v0.2-alpha)
+
+### Docker-Compose
+You can either download the source code and use the existing docker-compose.yml, which builds everything from scratch (make sure to set a volume for the data path!)
+
+Or you can use this docker-compose file, it does not need the source code (also adjust the data path):
+```yaml
+services:
+  serverhub:
+    image: ghcr.io/rhochr/serverhub:latest
+    container_name: serverhub
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./path/to/data/on/your/machine:/data
+    restart: unless-stopped
+```
