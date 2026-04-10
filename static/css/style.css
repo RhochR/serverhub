@@ -23,7 +23,11 @@
   --md-sys-color-error-container: #8C1D18;
   --md-sys-color-scrim: rgba(0,0,0,0.5);
 
-  --nav-width: 88px;
+  /* Rail dimensions */
+  --nav-rail-collapsed: 80px;
+  --nav-rail-expanded: 256px;
+  --nav-width: var(--nav-rail-collapsed);
+
   --radius-sm: 12px;
   --radius-md: 16px;
   --radius-lg: 28px;
@@ -39,6 +43,8 @@
 
   --transition-standard: 300ms cubic-bezier(0.2, 0, 0, 1);
   --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* MD3 Expressive motion: emphasized decelerate */
+  --transition-expand: 350ms cubic-bezier(0.05, 0.7, 0.1, 1.0);
 }
 
 [data-theme="light"] {
@@ -74,158 +80,326 @@ body {
   transition: background var(--transition-standard), color var(--transition-standard);
 }
 
-/* ─── Navigation Rail ─── */
+/* ═══════════════════════════════════════════════════
+ *  MD3 EXPRESSIVE NAVIGATION RAIL
+ *  ═══════════════════════════════════════════════════
+ *
+ *  Anatomy (top → bottom):
+ *    1. Menu icon button  — toggles collapsed ↔ expanded
+ *    2. FAB               — primary action, at top per spec
+ *    3. Destination items — 3–7 items, with active indicator
+ *    4. Footer utilities  — theme, category management
+ */
+
 .nav-rail {
-  width: var(--nav-width);
+  width: var(--nav-rail-collapsed);
   height: 100vh;
-  background: var(--md-sys-color-surface-variant);
+  background: var(--md-sys-color-surface-container);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 20px 0;
+  align-items: stretch;
+  padding: 12px 0 16px;
   flex-shrink: 0;
   position: relative;
-  z-index: 10;
-  border-right: 1px solid var(--md-sys-color-outline-variant);
-  gap: 4px;
+  z-index: 20;
+  overflow: hidden;
+  /* Smooth width transition — emphasized decelerate curve */
+  transition:
+  width var(--transition-expand),
+  background var(--transition-standard);
 }
 
+/* Expanded state */
+.nav-rail.expanded {
+  width: var(--nav-rail-expanded);
+}
+
+/* ── 1. Rail Header ── */
 .nav-rail-header {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
+  padding: 0 12px;
   gap: 4px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--md-sys-color-outline-variant);
-  width: 100%;
   margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
-.nav-logo {
-  width: 48px;
-  height: 48px;
+/* Menu / hamburger toggle button */
+.nav-menu-btn {
+  width: 56px;
+  height: 56px;
   border-radius: var(--radius-md);
-  background: var(--md-sys-color-primary-container);
+  background: transparent;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--md-sys-color-on-primary-container);
-  font-size: 26px;
-}
-
-.nav-label-main {
-  font-family: var(--font-display);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
   color: var(--md-sys-color-on-surface-variant);
-  text-transform: uppercase;
+  transition:
+  background var(--transition-standard),
+  color var(--transition-standard),
+  transform var(--transition-spring);
+  flex-shrink: 0;
+}
+.nav-menu-btn .material-icons-round { font-size: 24px; }
+.nav-menu-btn:hover {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
+  color: var(--md-sys-color-on-surface);
+}
+.nav-menu-btn:active { transform: scale(0.92); }
+
+/* ── 2. FAB ── */
+/* MD3 spec: FAB sits at top of rail, above destinations */
+.nav-fab {
+  height: 56px;
+  border-radius: var(--radius-lg);          /* 28px = large rounded shape */
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 0 16px;
+  /* Collapsed: icon only, width = 56px */
+  width: 56px;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+  width var(--transition-expand),
+  background var(--transition-standard),
+  transform var(--transition-spring),
+  box-shadow var(--transition-standard);
+  box-shadow: var(--shadow-2);
+  flex-shrink: 0;
+}
+.nav-rail.expanded .nav-fab {
+  /* Expanded: stretches to fill rail minus padding */
+  width: calc(var(--nav-rail-expanded) - 24px);
 }
 
+.nav-fab:hover {
+  background: color-mix(in srgb, var(--md-sys-color-primary-container) 92%, var(--md-sys-color-on-primary-container) 8%);
+  box-shadow: var(--shadow-3);
+  transform: scale(1.03);
+}
+.nav-fab:active { transform: scale(0.97); }
+
+.nav-fab-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  /* Rotate the + into × on hover for expressiveness */
+  transition: transform var(--transition-spring);
+}
+.nav-fab:hover .nav-fab-icon {
+  transform: rotate(90deg);
+}
+
+.nav-fab-label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.006em;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+  opacity var(--transition-expand),
+  transform var(--transition-expand);
+  pointer-events: none;
+}
+.nav-rail.expanded .nav-fab-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ── 3. Destination Items ── */
 .nav-items {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 2px;
-  width: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: none;
-  padding: 0 8px;
+  padding: 4px 12px;
 }
 .nav-items::-webkit-scrollbar { display: none; }
 
 .nav-item {
-  width: 100%;
+  /* Row layout for both collapsed and expanded */
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 4px;
-  padding: 10px 0;
+  gap: 0;
+  height: 56px;
   border-radius: var(--radius-md);
   cursor: pointer;
   border: none;
   background: transparent;
   color: var(--md-sys-color-on-surface-variant);
-  transition: background var(--transition-standard), color var(--transition-standard), transform 200ms cubic-bezier(0.34,1.56,0.64,1);
+  transition:
+  color var(--transition-standard),
+  background var(--transition-standard);
   position: relative;
   font-family: var(--font-body);
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0;
+  text-align: left;
 }
 
 .nav-item:hover {
-  background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
-  transform: scale(1.04);
+  color: var(--md-sys-color-on-surface);
 }
 
-.nav-item.active {
+/* Active indicator — the pill behind the icon */
+.nav-item-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;         /* icon zone */
+  height: 32px;        /* pill height */
+  border-radius: 100px;
+  flex-shrink: 0;
+  background: transparent;
+  transition:
+  background var(--transition-expand),
+  width var(--transition-expand);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover: subtle fill on indicator */
+.nav-item:hover .nav-item-indicator {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
+}
+
+/* Active state: fill indicator with primary-container */
+.nav-item.active .nav-item-indicator {
   background: var(--md-sys-color-primary-container);
+}
+.nav-item.active {
   color: var(--md-sys-color-on-primary-container);
 }
 
-.nav-item .material-icons-round {
-  font-size: 22px;
+/* Expanded: indicator stretches to full item width */
+.nav-rail.expanded .nav-item {
+  background: transparent; /* no bg on item itself */
+  border-radius: var(--radius-md);
+}
+.nav-rail.expanded .nav-item:hover {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
+}
+.nav-rail.expanded .nav-item.active {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+.nav-rail.expanded .nav-item:hover .nav-item-indicator,
+.nav-rail.expanded .nav-item.active .nav-item-indicator {
+  background: transparent; /* let item bg do the work */
+}
+.nav-rail.expanded .nav-item-indicator {
+  width: 48px;
 }
 
+/* Icon inside the indicator */
+.nav-item-indicator .material-icons-round {
+  font-size: 24px;
+  transition: transform var(--transition-spring);
+}
+.nav-item:active .nav-item-indicator .material-icons-round {
+  transform: scale(0.88);
+}
+
+/* Label */
 .nav-item-label {
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: 0.04em;
-  text-align: center;
-  max-width: 64px;
+  letter-spacing: 0.006em;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+  opacity var(--transition-expand),
+  transform var(--transition-expand);
+  padding-left: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  pointer-events: none;
+}
+.nav-rail.expanded .nav-item-label {
+  opacity: 1;
+  transform: translateX(0);
 }
 
+/* ── 4. Footer Utility Buttons ── */
 .nav-rail-footer {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding-top: 16px;
+  align-items: stretch;
+  gap: 2px;
+  padding: 8px 12px 0;
   border-top: 1px solid var(--md-sys-color-outline-variant);
-  width: 100%;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
-.nav-fab {
-  width: 52px;
-  height: 52px;
-  border-radius: var(--radius-lg);
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
-  border: none;
-  cursor: pointer;
+.nav-util-btn {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  transition: background var(--transition-standard), transform var(--transition-spring), box-shadow var(--transition-standard);
-  box-shadow: var(--shadow-2);
-}
-.nav-fab:hover {
-  background: color-mix(in srgb, var(--md-sys-color-primary-container) 92%, var(--md-sys-color-on-primary-container) 8%);
-  transform: scale(1.08) rotate(45deg);
-  box-shadow: var(--shadow-3);
-}
-.nav-fab:active { transform: scale(0.96) rotate(45deg); }
-
-.nav-icon-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  height: 48px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: none;
   background: transparent;
-  border: none;
-  cursor: pointer;
+  color: var(--md-sys-color-on-surface-variant);
+  transition:
+  background var(--transition-standard),
+  color var(--transition-standard);
+  font-family: var(--font-body);
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+}
+.nav-util-btn:hover {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
+  color: var(--md-sys-color-on-surface);
+}
+.nav-util-btn:active { transform: scale(0.96); }
+
+.nav-util-indicator {
+  width: 56px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--md-sys-color-on-surface-variant);
-  font-size: 20px;
-  transition: background var(--transition-standard), transform var(--transition-spring);
+  flex-shrink: 0;
+  border-radius: 100px;
 }
-.nav-icon-btn:hover {
-  background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
-  transform: scale(1.12);
+.nav-util-indicator .material-icons-round {
+  font-size: 22px;
+}
+
+.nav-util-label {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+  opacity var(--transition-expand),
+  transform var(--transition-expand);
+  pointer-events: none;
+}
+.nav-rail.expanded .nav-util-label {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* ─── Main Content ─── */
@@ -234,6 +408,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: margin-left var(--transition-expand);
 }
 
 .top-bar {
@@ -703,3 +878,35 @@ input[type="color"] {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--md-sys-color-outline-variant); border-radius: 3px; }
+
+/* ─── Tooltip for collapsed items ─── */
+.nav-item[data-tooltip],
+.nav-util-btn[data-tooltip] {
+  position: relative;
+}
+.nav-item[data-tooltip]::after,
+.nav-util-btn[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) scale(0.9);
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms, transform 150ms;
+  z-index: 50;
+  box-shadow: var(--shadow-2);
+}
+/* Only show tooltips when rail is collapsed */
+.nav-rail:not(.expanded) .nav-item[data-tooltip]:hover::after,
+.nav-rail:not(.expanded) .nav-util-btn[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}

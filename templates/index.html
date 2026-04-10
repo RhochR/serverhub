@@ -14,21 +14,40 @@
 
 <!-- Navigation Rail -->
 <nav class="nav-rail" id="navRail">
+
+  <!-- Rail Header: menu toggle + FAB -->
+  <div class="nav-rail-header">
+    <button class="nav-menu-btn" id="navMenuBtn" title="Toggle navigation">
+      <span class="material-icons-round">menu</span>
+    </button>
+    <!-- FAB lives at top of rail per MD3 spec -->
+    <button class="nav-fab" id="addServerBtn" title="Add server">
+      <span class="material-icons-round nav-fab-icon">add</span>
+      <span class="nav-fab-label">Add Server</span>
+    </button>
+  </div>
+
+  <!-- Destination Items -->
   <div class="nav-items" id="navItems">
     <!-- dynamically filled -->
   </div>
 
+  <!-- Rail Footer: utility actions -->
   <div class="nav-rail-footer">
-    <button class="nav-fab" id="addServerBtn" title="Add server">
-      <span class="material-icons-round">add</span>
+    <button class="nav-util-btn" id="themeToggle" title="Toggle theme">
+      <div class="nav-util-indicator">
+        <span class="material-icons-round" id="themeIcon">light_mode</span>
+      </div>
+      <span class="nav-util-label">Theme</span>
     </button>
-    <button class="nav-icon-btn" id="themeToggle" title="Toggle theme">
-      <span class="material-icons-round" id="themeIcon">light_mode</span>
-    </button>
-    <button class="nav-icon-btn" id="manageCatsBtn" title="Manage categories">
-      <span class="material-icons-round">category</span>
+    <button class="nav-util-btn" id="manageCatsBtn" title="Manage categories">
+      <div class="nav-util-indicator">
+        <span class="material-icons-round">category</span>
+      </div>
+      <span class="nav-util-label">Categories</span>
     </button>
   </div>
+
 </nav>
 
 <!-- Main Content -->
