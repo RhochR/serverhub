@@ -22,11 +22,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set image tags
+        id: tags
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            if [ "${{ github.event.release.prerelease }}" = "true" ]; then
+              echo "tags=ghcr.io/rhochr/serverhub:${{ github.ref_name }},ghcr.io/rhochr/serverhub:edge" >> $GITHUB_OUTPUT
+            else
+              echo "tags=ghcr.io/rhochr/serverhub:${{ github.ref_name }},ghcr.io/rhochr/serverhub:latest" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "tags=ghcr.io/rhochr/serverhub:dev" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: |
-            ghcr.io/rhochr/serverhub:${{ github.ref_name }}
-            ${{ github.event.release.prerelease == false && 'ghcr.io/rhochr/serverhub:latest' || 'ghcr.io/rhochr/serverhub:edge' }}
+          tags: ${{ steps.tags.outputs.tags }}
