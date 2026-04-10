@@ -408,7 +408,6 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: margin-left var(--transition-expand);
 }
 
 .top-bar {
@@ -483,7 +482,9 @@ body {
 /* ─── Server Grid ─── */
 .server-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  /* Changed from minmax(280px, 1fr) to a fixed 340px. */
+  grid-template-columns: repeat(auto-fill, 340px);
+  justify-content: flex-start; /* Keeps them aligned nicely left */
   gap: 18px;
 }
 
@@ -548,7 +549,7 @@ body {
   transition: transform var(--transition-spring);
 }
 .server-card:hover .card-icon-wrap {
-  transform: scale(1.1) rotate(-5deg);
+  transform: scale(1.07);
 }
 
 .card-actions {
