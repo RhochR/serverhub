@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Server Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Display:wght@400;500;700&family=Google+Sans:wght@400;500&family=Google+Sans+Mono&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+<!-- Navigation Rail -->
+<nav class="nav-rail" id="navRail">
+  <div class="nav-items" id="navItems">
+    <!-- dynamically filled -->
+  </div>
+
+  <div class="nav-rail-footer">
+    <button class="nav-fab" id="addServerBtn" title="Server hinzufügen">
+      <span class="material-icons-round">add</span>
+    </button>
+    <button class="nav-icon-btn" id="themeToggle" title="Theme wechseln">
+      <span class="material-icons-round" id="themeIcon">light_mode</span>
+    </button>
+    <button class="nav-icon-btn" id="manageCatsBtn" title="Kategorien verwalten">
+      <span class="material-icons-round">category</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main class="main-content" id="mainContent">
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <h1 class="page-title" id="pageTitle">Alle Server</h1>
+      <span class="server-count" id="serverCount">0 Server</span>
+    </div>
+    <div class="top-bar-right">
+      <div class="search-bar">
+        <span class="material-icons-round search-icon">search</span>
+        <input type="text" id="searchInput" placeholder="Suchen…" autocomplete="off" />
+      </div>
+    </div>
+  </header>
+
+  <div class="content-area">
+    <div class="server-grid" id="serverGrid">
+      <!-- cards injected by JS -->
+    </div>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <span class="material-icons-round empty-icon">dns</span>
+      <p>Keine Server in dieser Kategorie.</p>
+      <button class="btn-filled" onclick="openAddModal()">Server hinzufügen</button>
+    </div>
+  </div>
+</main>
+
+<!-- Add/Edit Server Modal -->
+<div class="modal-backdrop" id="serverModal">
+  <div class="modal md3-dialog">
+    <div class="modal-header">
+      <h2 id="modalTitle">Server hinzufügen</h2>
+      <button class="icon-btn" onclick="closeModal('serverModal')">
+        <span class="material-icons-round">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId" />
+      <div class="field-group">
+        <label class="field-label">Name</label>
+        <div class="text-field">
+          <input type="text" id="sName" placeholder="z.B. Home Server" />
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">URL</label>
+        <div class="text-field">
+          <input type="text" id="sUrl" placeholder="https://..." />
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Beschreibung</label>
+        <div class="text-field">
+          <input type="text" id="sDesc" placeholder="Optional" />
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Kategorie</label>
+        <div class="text-field select-wrap">
+          <select id="sCat"></select>
+          <span class="material-icons-round select-arrow">expand_more</span>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Icon (Material Icon Name)</label>
+        <div class="text-field icon-field">
+          <input type="text" id="sIcon" placeholder="dns" oninput="updateIconPreview()" />
+          <span class="material-icons-round icon-preview" id="iconPreview">dns</span>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Farbe</label>
+        <div class="color-picker-row">
+          <div class="color-swatches" id="colorSwatches"></div>
+          <input type="color" id="sColor" value="#6750A4" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-text" onclick="closeModal('serverModal')">Abbrechen</button>
+      <button class="btn-filled" onclick="saveServer()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- Category Manager Modal -->
+<div class="modal-backdrop" id="catModal">
+  <div class="modal md3-dialog">
+    <div class="modal-header">
+      <h2>Kategorien verwalten</h2>
+      <button class="icon-btn" onclick="closeModal('catModal')">
+        <span class="material-icons-round">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="catList" class="cat-list"></div>
+      <div class="field-group" style="margin-top:20px">
+        <label class="field-label">Neue Kategorie</label>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="text-field" style="flex:1">
+            <input type="text" id="newCatName" placeholder="Name" />
+          </div>
+          <div class="text-field" style="width:150px">
+            <input type="text" id="newCatIcon" placeholder="Icon (z.B. cloud)" />
+          </div>
+          <button class="btn-filled" onclick="addCategory()">
+            <span class="material-icons-round">add</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-filled" onclick="closeModal('catModal')">Fertig</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal md3-dialog small-dialog">
+    <div class="modal-header">
+      <h2>Server löschen?</h2>
+    </div>
+    <div class="modal-body">
+      <p id="confirmText">Möchtest du diesen Server wirklich löschen?</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-text" onclick="closeModal('confirmModal')">Abbrechen</button>
+      <button class="btn-filled danger" id="confirmDeleteBtn">Löschen</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

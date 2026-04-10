@@ -1,0 +1,14 @@
+services:
+  serverhub:
+    build: .
+    container_name: serverhub
+    ports:
+      - "5000:5000"
+    volumes:
+      - serverhub_data:/data
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Vienna
+
+volumes:
+  serverhub_data:
