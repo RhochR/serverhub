@@ -23,7 +23,7 @@ There are three channels to container releases:
 - :edge
    The latest pre-release
 - :latest
-   The latest version
+   The latest version (recommended)
 - You can alway specify a specific release (e.g. :v0.2-alpha)
 
 ### Docker-Compose
