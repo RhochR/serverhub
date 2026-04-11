@@ -1,7 +1,9 @@
 # serverhub
 A dashboard for accessing all your selfhosted servers quickly.
 
-![Screenshot](https://raw.githubusercontent.com/RhochR/serverhub/refs/heads/main/screenshots/Screenshot.png)
+| Dark Mode               | Light mode               |
+| ---------------------- | ---------------------- |
+| ![Screenshot](https://raw.githubusercontent.com/RhochR/serverhub/refs/heads/main/screenshots/Screenshot_dark.png) | ![Screenshot](https://raw.githubusercontent.com/RhochR/serverhub/refs/heads/main/screenshots/Screenshot_light.png) |
 
 ## ⚡ Features
 
