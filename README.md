@@ -43,4 +43,4 @@ services:
 ```
 
 ### Transparency
-The creation of this project was AI-Assisted. The very inital prototyp (release v0.1) was mostly AI-Generated. UI and UX Decisions are Human-made.
+The creation of this project was AI-Assisted. The very inital prototype (release v0.1) was mostly AI-Generated. UI and UX Decisions are Human-made.
