@@ -41,3 +41,6 @@ services:
       - ./path/to/data/on/your/machine:/data
     restart: unless-stopped
 ```
+
+### Transparency
+The creation of this project was AI-Assisted. The very inital prototyp (release v0.1) was mostly AI-Generated. UI and UX Decisions are Human-made.
